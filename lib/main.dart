@@ -1,5 +1,8 @@
 import 'package:Ucoe/Provider/ProviderData.dart';
 import 'package:Ucoe/Screens/Login.dart';
+import 'package:Ucoe/Screens/Navigation.dart';
+import 'package:Ucoe/Screens/splash.dart';
+import 'package:Ucoe/Tabs/Track.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -21,13 +24,13 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (BuildContext context) => ProviderData(),
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: login(),
-      ),
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: login(),
+          routes: {'/Track': (context) => Track()}),
     );
   }
 }
