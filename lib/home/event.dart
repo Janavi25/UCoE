@@ -50,7 +50,7 @@ class _eventState extends State<event> {
         margin: EdgeInsets.only(left: 10, right: 10, top: 10),
         decoration: shadowBox,
 
-        height: 100,
+        height: 120,
         child: Row(
           children: [
             Container(
