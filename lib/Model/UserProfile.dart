@@ -1,26 +1,37 @@
 class userprofile {
-  String Email, Name, aboutus, uid, Photo, DOB, phone;
-  var Date;
+  String uid, email, password, phone, classroom, location, name, Photo;
+  var changeYear;
+  var CheckFees, Fees, FeesPaid, checkFees;
 
   userprofile(
-      {this.Email,
-      this.Name,
-      this.aboutus,
-      this.uid,
-      this.Photo,
+      {this.uid,
+      this.email,
+      this.password,
       this.phone,
-      this.DOB,
-      this.Date});
+      this.classroom,
+      this.location,
+      this.name,
+      this.Photo,
+      this.changeYear,
+      this.CheckFees,
+      this.Fees,
+      this.FeesPaid,
+      this.checkFees});
 
   factory userprofile.fromDocument(doc) {
     return userprofile(
-        Email: doc['Email'],
-        Name: doc['Name'],
-        aboutus: doc['aboutus'],
         uid: doc['uid'],
-        Photo: doc['Photo'],
-        DOB: doc['DOB'],
+        email: doc['email'],
+        password: doc['password'],
         phone: doc['phone'],
-        Date: doc['Date']);
+        classroom: doc['classroom'],
+        location: doc['location'],
+        name: doc['name'],
+        Photo: doc['Photo'],
+        changeYear: doc['changeYear'],
+        CheckFees: doc['CheckFees'],
+        Fees: doc['Fees'],
+        FeesPaid: doc['FeesPaid'],
+        checkFees: doc['checkFees']);
   }
 }

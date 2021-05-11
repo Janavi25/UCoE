@@ -132,13 +132,18 @@
 //   showDialog(context: context, builder: (BuildContext context) => baseDialog);
 // }
 
+import 'package:Ucoe/Provider/ProviderData.dart';
 import 'package:Ucoe/Screens/Mappage.dart';
+import 'package:Ucoe/Screens/bus.dart';
 import 'package:Ucoe/Tabs/Profile.dart';
 import 'package:Ucoe/Tabs/Track.dart';
 import 'package:Ucoe/Tabs/fees.dart';
 import 'package:Ucoe/Tabs/home.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+var color = Colors.white;
 
 class Navigation extends StatefulWidget {
   @override
@@ -188,17 +193,34 @@ class NavigationState extends State<Navigation> {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<ProviderData>(context);
     return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Colors.indigo[900],
+      // ),
       body: buildPageView(),
       bottomNavigationBar: CurvedNavigationBar(
+        color: Color(0xFF19196f),
         backgroundColor: Colors.grey[50],
-        buttonBackgroundColor: Colors.red[300],
+        buttonBackgroundColor: Color(0xFF19196f),
         index: bottomSelectedIndex,
         items: [
-          Icon(Icons.home),
-          Icon(Icons.bus_alert),
-          Icon(Icons.fact_check),
-          Icon(Icons.account_circle)
+          Icon(
+            Icons.home,
+            color: color,
+          ),
+          Icon(
+            Icons.bus_alert,
+            color: color,
+          ),
+          Icon(
+            Icons.fact_check,
+            color: color,
+          ),
+          Icon(
+            Icons.account_circle,
+            color: color,
+          )
         ],
         onTap: (index) {
           bottomTapped(index);

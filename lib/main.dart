@@ -1,8 +1,11 @@
 import 'package:Ucoe/Provider/ProviderData.dart';
 import 'package:Ucoe/Screens/Login.dart';
+import 'package:Ucoe/Screens/Mappage.dart';
 import 'package:Ucoe/Screens/Navigation.dart';
+import 'package:Ucoe/Screens/bus.dart';
 import 'package:Ucoe/Screens/splash.dart';
 import 'package:Ucoe/Tabs/Track.dart';
+import 'package:Ucoe/home/announcement.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -29,7 +32,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: login(),
+          home: splash(),
           routes: {'/Track': (context) => Track()}),
     );
   }

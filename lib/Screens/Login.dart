@@ -1,5 +1,8 @@
 // import 'package:Ucoe/fcm_item.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:Ucoe/Provider/ProviderData.dart';
 import 'package:Ucoe/Screens/Navigation.dart';
 import 'package:Ucoe/style/colour.dart';
@@ -7,13 +10,17 @@ import 'package:Ucoe/style/decoration.dart';
 import 'package:Ucoe/style/text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 colour color = colour();
 decoration deco = decoration();
 text txt = text();
+var imageurl = '';
 
 class login extends StatefulWidget {
   @override
@@ -38,7 +45,9 @@ class _loginState extends State<login> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passController = TextEditingController();
   var provider;
-  TextEditingController _enroll_controller = new TextEditingController();
+  TextEditingController _namecontroller = new TextEditingController();
+  TextEditingController _phoneCOntroller = new TextEditingController();
+  var _chosenvalueClass, _chosenvalueLocation;
   // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   //
   //
@@ -46,6 +55,7 @@ class _loginState extends State<login> {
   // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   String _homeScreenText = "Waiting for token...";
   User user;
+  var imageselected = false;
   //
   // initializeFCM() {
   //   _firebaseMessaging.configure(
@@ -349,230 +359,427 @@ class _loginState extends State<login> {
     );
   }
 
+//yaha se register karo
   Widget SignUp(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30.0, left: 15, right: 15),
-      child: Column(
-        children: <Widget>[
-          Stack(
-              overflow: Overflow.visible,
-              alignment: Alignment.bottomCenter,
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 0.0, left: 15, right: 15),
+            child: Column(
               children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 10.0, left: 15, right: 15, bottom: 20),
-                    child: Column(
-                      children: <Widget>[
-                        TextFormField(
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.person,
-                                color: Colors.grey,
-                              ),
-                              labelText: "Name",
-                              labelStyle: TextStyle(color: Colors.black87),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent))),
-                        ),
-                        Divider(color: Colors.grey, height: 8),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.phone,
-                                color: Colors.grey,
-                              ),
-                              labelText: "Phone Number",
-                              labelStyle: TextStyle(color: Colors.black87),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent))),
-                        ),
-                        Divider(color: Colors.grey, height: 8),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.location_pin,
-                                color: Colors.grey,
-                              ),
-                              labelText: "Location",
-                              labelStyle: TextStyle(color: Colors.black87),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent))),
-                        ),
-                        Divider(color: Colors.grey, height: 8),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.assignment_ind,
-                                color: Colors.grey,
-                              ),
-                              labelText: "Email ID",
-                              labelStyle: TextStyle(color: Colors.black87),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent))),
-                        ),
-                        Divider(color: Colors.grey, height: 8),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.school,
-                                color: Colors.grey,
-                              ),
-                              labelText: "Class",
-                              labelStyle: TextStyle(color: Colors.black87),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent))),
-                        ),
-                        Divider(color: Colors.grey, height: 8),
-                        TextFormField(
-                          controller: _passController,
-                          obscureText: _passwordVisible,
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.lock,
-                                color: Colors.grey,
-                              ),
-                              suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _passwordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Colors.black,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _passwordVisible = !_passwordVisible;
-                                    });
-                                  }),
-                              labelText: "Password",
-                              labelStyle: TextStyle(color: Colors.black87),
-                              enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent)),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.transparent))),
-                        ),
-                        Divider(
-                          color: Colors.transparent,
-                          height: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 410,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (_emailController.text != null &&
-                            _passController.text != null) {
-                          FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                  email: _emailController.text,
-                                  password: _passController.text)
-                              .then((value) async {
-                            User user = value.user;
-                            // print(_nameController.text);
-
-                            print('you clicked login');
-                            if (user.uid != null) {
-                              await FirebaseFirestore.instance
-                                  .collection('/users')
-                                  .doc(user.uid)
-                                  .set({
-                                'uid': user.uid,
-                                // 'DOB': dOB,
-                                // 'Name': _nameController.text,
-                                'Email': _emailController.text,
-                                'phone': 'Number',
-                                'aboutus':
-                                    '\"You Know Yourself better\"...Tell About Yourself',
-                                'Photo':
-                                    'https://cactusthemes.com/blog/wp-content/uploads/2018/01/tt_avatar_small.jpg',
-                              }).then((result) {
-                                print("User Added");
-                                provider.setemail(_emailController.text);
-                                provider.setpassword(_passController.text);
-                                provider.setuid(user.uid);
-                              }).catchError((e) {
-                                print("Error: $e" + "!");
-                                DialogBox(context, e.toString());
-                              });
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) => Navigation()));
-                            } else {
-                              DialogBox(context, 'Error');
-                            }
-                          }).catchError((e) {
-                            DialogBox(context, e.toString());
-                          });
-                        } else {
-                          DialogBox2(context);
-                        }
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 100,
+                Stack(
+                    overflow: Overflow.visible,
+                    alignment: Alignment.bottomCenter,
+                    children: <Widget>[
+                      Container(
                         decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: colors,
-                            ),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10)),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: Center(
-                              child: Text(
-                            "SIGNUP",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
-                          )),
+                          padding: const EdgeInsets.only(
+                              top: 10.0, left: 15, right: 15, bottom: 20),
+                          child: Column(
+                            children: <Widget>[
+                              TextFormField(
+                                controller: _namecontroller,
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.person,
+                                      color: Colors.grey,
+                                    ),
+                                    labelText: "Name",
+                                    labelStyle:
+                                        TextStyle(color: Colors.black87),
+                                    enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent)),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent))),
+                              ),
+                              Divider(color: Colors.grey, height: 8),
+                              TextFormField(
+                                controller: _phoneCOntroller,
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.phone,
+                                      color: Colors.grey,
+                                    ),
+                                    labelText: "Phone Number",
+                                    labelStyle:
+                                        TextStyle(color: Colors.black87),
+                                    enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent)),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent))),
+                              ),
+                              Divider(color: Colors.grey, height: 8),
+                              Container(
+                                  // width: 0,
+                                  padding: EdgeInsets.only(left: 13),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.location_pin,
+                                        color: Colors.grey,
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 12),
+                                        child: DropdownButton<String>(
+                                          focusColor: Colors.white,
+                                          underline: Container(),
+                                          value: _chosenvalueLocation,
+                                          //elevation: 5,
+                                          style: TextStyle(color: Colors.white),
+                                          // iconEnabledColor: Colors.black,
+                                          items: <String>[
+                                            'Mira Road',
+                                            'Vasai',
+                                            'Thane',
+                                            'Borivali',
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(
+                                                value,
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          hint: Text(
+                                            "Select Location",
+                                            style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16),
+                                          ),
+                                          onChanged: (String value) {
+                                            setState(() {
+                                              _chosenvalueLocation = value;
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  )),
+                              // TextFormField(
+                              //   decoration: InputDecoration(
+                              //       prefixIcon: Icon(
+                              //         Icons.location_pin,
+                              //         color: Colors.grey,
+                              //       ),
+                              //       labelText: "Location",
+                              //       labelStyle: TextStyle(color: Colors.black87),
+                              //       enabledBorder: UnderlineInputBorder(
+                              //           borderSide:
+                              //               BorderSide(color: Colors.transparent)),
+                              //       focusedBorder: UnderlineInputBorder(
+                              //           borderSide:
+                              //               BorderSide(color: Colors.transparent))),
+                              // ),
+                              Divider(color: Colors.grey, height: 8),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.assignment_ind,
+                                      color: Colors.grey,
+                                    ),
+                                    labelText: "Email ID",
+                                    labelStyle:
+                                        TextStyle(color: Colors.black87),
+                                    enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent)),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent))),
+                              ),
+                              Divider(color: Colors.grey, height: 8),
+                              // TextFormField(
+                              //   decoration: InputDecoration(
+                              //       prefixIcon: Icon(
+                              //         Icons.school,
+                              //         color: Colors.grey,
+                              //       ),
+                              //       labelText: "Class",
+                              //       labelStyle: TextStyle(color: Colors.black87),
+                              //       enabledBorder: UnderlineInputBorder(
+                              //           borderSide:
+                              //               BorderSide(color: Colors.transparent)),
+                              //       focusedBorder: UnderlineInputBorder(
+                              //           borderSide:
+                              //               BorderSide(color: Colors.transparent))),
+                              // ),
+                              Container(
+                                  // width: 0,
+                                  padding: EdgeInsets.only(left: 13),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.school,
+                                        color: Colors.grey,
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 12),
+                                        child: DropdownButton<String>(
+                                          focusColor: Colors.white,
+                                          underline: Container(),
+                                          value: _chosenvalueClass,
+                                          //elevation: 5,
+                                          style: TextStyle(color: Colors.white),
+                                          // iconEnabledColor: Colors.black,
+                                          items: <String>[
+                                            'FE',
+                                            'SE',
+                                            'TE',
+                                            'BE',
+                                            'College Staff or Faculty Members'
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(
+                                                value,
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          hint: Text(
+                                            "Select Year",
+                                            style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16),
+                                          ),
+                                          onChanged: (String value) {
+                                            setState(() {
+                                              _chosenvalueClass = value;
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  )),
+                              Divider(color: Colors.grey, height: 8),
+                              TextFormField(
+                                controller: _passController,
+                                obscureText: _passwordVisible,
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.lock,
+                                      color: Colors.grey,
+                                    ),
+                                    suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _passwordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Colors.black,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _passwordVisible =
+                                                !_passwordVisible;
+                                          });
+                                        }),
+                                    labelText: "Password",
+                                    labelStyle:
+                                        TextStyle(color: Colors.black87),
+                                    enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent)),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent))),
+                              ),
+
+                              Divider(
+                                color: Colors.transparent,
+                                height: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        top: 410,
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              print(
+                                  'ontapooooooooooooooooooooooooooooooooooooo');
+                              if (_emailController.text != null &&
+                                  _passController.text != null) {
+                                FirebaseAuth.instance
+                                    .createUserWithEmailAndPassword(
+                                        email: _emailController.text,
+                                        password: _passController.text)
+                                    .then((value) async {
+                                  User user = value.user;
+                                  // print(_nameController.text);
+
+                                  print('you clicked login');
+                                  if (user.uid != null) {
+                                    await FirebaseFirestore.instance
+                                        .collection('/users')
+                                        .doc(user.uid)
+                                        .set({
+                                      'uid': user.uid,
+                                      'email': _emailController.text,
+                                      'phone': _phoneCOntroller.text,
+                                      'CheckFees': 0,
+                                      'Fees': 0,
+                                      'FeesPaid': 0,
+                                      'changeYear': false,
+                                      'checkFees': 0,
+                                      'classroom': _chosenvalueClass,
+                                      'userPhoto':
+                                          'https://www.cybersport.ru/assets/img/no-photo/user.png',
+                                      'location': _chosenvalueLocation,
+                                      'name': _namecontroller.text,
+                                      'password': _passController.text,
+                                      'Photo': imageurl == ''
+                                          ? 'https://www.cybersport.ru/assets/img/no-photo/user.png'
+                                          : imageurl,
+                                    }).then((result) {
+                                      print("User Added");
+                                      provider.setemail(_emailController.text);
+                                      provider
+                                          .setpassword(_passController.text);
+                                      provider.setuid(user.uid);
+                                      provider
+                                          .setlocation(_chosenvalueLocation);
+                                      provider.setPhoto(imageurl);
+                                      provider.setphone(_phoneCOntroller.text);
+                                    }).catchError((e) {
+                                      print("Error: $e" + "!");
+                                      print(
+                                          'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+                                      DialogBox(context, e.toString());
+                                    });
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                Navigation()));
+                                  } else {
+                                    DialogBox(context, 'Error Authentication');
+                                  }
+                                }).catchError((e) {
+                                  DialogBox(context, e.toString());
+                                });
+                              } else {
+                                print(
+                                    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+                                DialogBox2(context);
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width - 100,
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: colors,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                child: Center(
+                                    child: Text(
+                                  "SIGNUP",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                )),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                Padding(
+                  padding: const EdgeInsets.only(top: 40.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[],
                   ),
                 ),
-              ]),
-          Padding(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[],
+                Padding(
+                  padding: const EdgeInsets.only(top: 30.0),
+                ),
+              ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-          ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: 30,
+        )
+      ],
     );
+  }
+
+  uploadImage() async {
+    // imageurl = "";
+    print('This Code Will Run');
+    final _storage = FirebaseStorage.instance;
+    final _picker = ImagePicker();
+    PickedFile image;
+
+    //Check Permissions
+    await Permission.photos.request();
+
+    var permissionStatus = await Permission.photos.status;
+
+    if (permissionStatus.isGranted) {
+      //Select Image
+      image = await _picker.getImage(source: ImageSource.gallery);
+      var file = File(image.path);
+      if (image != null) {
+        //Upload to Firebase
+        var snapshot = await _storage
+            .ref()
+            .child('UserImage')
+            // .child(roomId)
+            .child(generateRandomString(200))
+            .putFile(file);
+
+        var downloadUrl = await snapshot.ref.getDownloadURL();
+
+        setState(() {
+          imageurl = downloadUrl;
+        });
+        DialogBoxImage(context);
+
+        // // FirebaseFirestore.instance.collection('Feed').add({
+        // //   'Photo': imageurl,
+        // //   'Head': heading.text,
+        // //   'body': bodymaterial.text,
+        // // });
+
+        // print(imageurl);
+      } else {
+        print('No Path Received');
+      }
+    } else {
+      print('Grant Permissions and try again');
+    }
+  }
+
+  String generateRandomString(int len) {
+    var r = Random();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
   }
 
   void DialogBox(context, String error) {
@@ -626,11 +833,31 @@ class _loginState extends State<login> {
     showDialog(context: context, builder: (BuildContext context) => baseDialog);
   }
 
+  void DialogBoxImage(context) {
+    var baseDialog = AlertDialog(
+      title: new Text("Image"),
+      content: Container(
+        child: Text('Image Uploaded'),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          color: color.themeA,
+          child: new Text("ok"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context) => baseDialog);
+  }
+
   void DialogBox2(context) {
     var baseDialog = AlertDialog(
       title: new Text("Warning"),
       content: Container(
-        child: Text('Enter All The Fields'),
+        child: Text('Enter Proper Data'),
       ),
       actions: <Widget>[
         FlatButton(

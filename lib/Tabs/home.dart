@@ -1,8 +1,16 @@
+import 'package:Ucoe/Model/UserProfile.dart';
+import 'package:Ucoe/Provider/ProviderData.dart';
 import 'package:Ucoe/Tabs/Track.dart';
+import 'package:Ucoe/home/announcement.dart';
+import 'package:Ucoe/home/event.dart';
+import 'package:Ucoe/home/life.dart';
 import 'package:Ucoe/style/decoration.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:Ucoe/Screens/Navigation.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // NavigationState nav = NavigationState(n: 0);
 
@@ -12,6 +20,16 @@ class home extends StatefulWidget {
 }
 
 class _homeState extends State<home> {
+  var uid;
+  userprofile localuser;
+  DocumentSnapshot doc;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
+
   final List<Widget> imageSliders = [
     'https://cache.careers360.mobi/media/presets/720X480/colleges/social-media/media-gallery/8786/2019/2/18/Campus%20View%20of%20Universal%20College%20of%20Engineering%20Thane_Campus-View.jpg',
     'https://universalcollegeofengineering.edu.in/wp-content/uploads/2019/07/workshop-img01.jpg',
@@ -41,230 +59,324 @@ class _homeState extends State<home> {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<ProviderData>(context);
+    return FutureBuilder(
+        future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return loadingwidget();
+          } else {
+            return Scaffold(
+              backgroundColor: Colors.grey[50],
+              body: ListView(
+                children: [
+                  Container(
+                    height: 40,
+                    margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                    // child: Slider(),
+                    child: Image(
+                      image: NetworkImage(
+                          "https://image3.mouthshut.com/images/imagesp/925769502s.png"),
+                    ),
+                  ),
+                  Container(
+                    height: 200,
+                    margin: EdgeInsets.only(top: 10),
+                    child: Slider(),
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 20),
+                      child: Wrap(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => event()));
+                            },
+                            child: Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                        left: 20, right: 20, top: 20),
+                                    height: 130,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                        color: Colors.green[100],
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            topLeft:
+                                                const Radius.circular(20.0),
+                                            topRight:
+                                                const Radius.circular(20.0))),
+                                    child: Image(
+                                      image: NetworkImage(
+                                          "https://img.icons8.com/bubbles/2x/speaker.png"),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin:
+                                        EdgeInsets.only(left: 20, right: 20),
+                                    padding: EdgeInsets.all(10),
+                                    height: 50,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            bottomLeft:
+                                                const Radius.circular(20.0),
+                                            bottomRight:
+                                                const Radius.circular(20.0))),
+                                    child: Text(
+                                      'Upcoming Events',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => event()));
+                            },
+                            child: Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.only(top: 20),
+                                    height: 130,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                        color: Colors.red[100],
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            topLeft:
+                                                const Radius.circular(20.0),
+                                            topRight:
+                                                const Radius.circular(20.0))),
+                                    child: Image(
+                                      image: NetworkImage(
+                                        "https://img.icons8.com/bubbles/2x/money.png",
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            bottomLeft:
+                                                const Radius.circular(20.0),
+                                            bottomRight:
+                                                const Radius.circular(20.0))),
+                                    child: Text(
+                                      'Bus Fee Structure',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => life()));
+                            },
+                            child: Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                        left: 20, right: 20, top: 20),
+                                    height: 130,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue[100],
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            topLeft:
+                                                const Radius.circular(20.0),
+                                            topRight:
+                                                const Radius.circular(20.0))),
+                                    child: Image(
+                                      image: NetworkImage(
+                                        "https://www.freepngvectors.com/wp-content/uploads/2020/12/education-group-icon11.png",
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            bottomLeft:
+                                                const Radius.circular(20.0),
+                                            bottomRight:
+                                                const Radius.circular(20.0))),
+                                    child: Text(
+                                      'Life at UCoE',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => announcement()));
+                            },
+                            child: Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.only(top: 20),
+                                    height: 130,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                        color: Colors.yellow[50],
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey[600],
+                                            blurRadius: 1.0,
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.only(
+                                            topLeft:
+                                                const Radius.circular(20.0),
+                                            topRight:
+                                                const Radius.circular(20.0))),
+                                    child: Image(
+                                      image: NetworkImage(
+                                        "https://img.icons8.com/bubbles/2x/appointment-reminders.png",
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  announcement()));
+                                    },
+                                    child: Container(
+                                      height: 50,
+                                      width: 150,
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            new BoxShadow(
+                                              color: Colors.grey[600],
+                                              blurRadius: 1.0,
+                                            ),
+                                          ],
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft:
+                                                  const Radius.circular(20.0),
+                                              bottomRight:
+                                                  const Radius.circular(20.0))),
+                                      child: Text(
+                                        'Announcement',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
+        });
+  }
+
+  Widget loadingwidget() {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: ListView(
-        children: [
-          Container(
-            height: 40,
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            // child: Slider(),
-            child: Image(
-              image: NetworkImage(
-                  "https://image3.mouthshut.com/images/imagesp/925769502s.png"),
-            ),
-          ),
-          Container(
-            height: 200,
-            margin: EdgeInsets.only(top: 10),
-            child: Slider(),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 20),
-            child: Wrap(
-              children: [
-                Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-                        height: 130,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            color: Colors.green[100],
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                topLeft: const Radius.circular(20.0),
-                                topRight: const Radius.circular(20.0))),
-                        child: Image(
-                          image: NetworkImage(
-                              "https://img.icons8.com/bubbles/2x/speaker.png"),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 20, right: 20),
-                        padding: EdgeInsets.all(10),
-                        height: 50,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: const Radius.circular(20.0),
-                                bottomRight: const Radius.circular(20.0))),
-                        child: Text(
-                          'Upcoming Events',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        height: 130,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            color: Colors.red[100],
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                topLeft: const Radius.circular(20.0),
-                                topRight: const Radius.circular(20.0))),
-                        child: Image(
-                          image: NetworkImage(
-                            "https://img.icons8.com/bubbles/2x/money.png",
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 50,
-                        width: 150,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: const Radius.circular(20.0),
-                                bottomRight: const Radius.circular(20.0))),
-                        child: Text(
-                          'Bus Fee Structure',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-                        height: 130,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            color: Colors.blue[100],
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                topLeft: const Radius.circular(20.0),
-                                topRight: const Radius.circular(20.0))),
-                        child: Image(
-                          image: NetworkImage(
-                            "https://www.freepngvectors.com/wp-content/uploads/2020/12/education-group-icon11.png",
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 50,
-                        width: 150,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: const Radius.circular(20.0),
-                                bottomRight: const Radius.circular(20.0))),
-                        child: Text(
-                          'Life at UCoE',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        height: 130,
-                        width: 150,
-                        decoration: BoxDecoration(
-                            color: Colors.yellow[50],
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                topLeft: const Radius.circular(20.0),
-                                topRight: const Radius.circular(20.0))),
-                        child: Image(
-                          image: NetworkImage(
-                            "https://img.icons8.com/bubbles/2x/appointment-reminders.png",
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 50,
-                        width: 150,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              new BoxShadow(
-                                color: Colors.grey[600],
-                                blurRadius: 1.0,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: const Radius.circular(20.0),
-                                bottomRight: const Radius.circular(20.0))),
-                        child: Text(
-                          'Announcement',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
+  }
+
+  getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid');
+    doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    print(doc.data);
+    setState(() {
+      localuser = userprofile.fromDocument(doc);
+    });
+    print(localuser.email);
   }
 
   Widget Slider() {

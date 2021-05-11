@@ -1,8 +1,11 @@
+import 'package:Ucoe/Provider/ProviderData.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const double CAMERA_ZOOM = 18;
 const double CAMERA_TILT = 0;
@@ -16,11 +19,28 @@ String icona = 'assets/images/bus.png';
 String iconc = 'assets/images/destination_map_marker.png';
 
 class MapPage extends StatefulWidget {
+  String busval;
+  String location;
+  MapPage({@required this.busval, @required this.location});
   @override
-  State<StatefulWidget> createState() => MapPageState();
+  State<StatefulWidget> createState() =>
+      MapPageState(busval: busval, location: location);
 }
 
 class MapPageState extends State<MapPage> {
+  String busval;
+  String location;
+
+  MapPageState({@required this.busval, @required this.location});
+
+  PolylinePoints polylinePoints;
+
+// List of coordinates to join
+  List<LatLng> polylineCoordinates = [];
+
+// Map storing polylines created by connecting
+// two points
+  Map<PolylineId, Polyline> polylines = {};
   LatLng DRIVER_LOCATION = LatLng(19.2798547, 72.8740709);
   double lat = 0, lng = 0;
   Completer<GoogleMapController> _controller = Completer();
@@ -29,10 +49,10 @@ class MapPageState extends State<MapPage> {
   // this will hold the generated polylines
   Set<Polyline> _polylines = {};
   // this will hold each polyline coordinate as Lat and Lng pairs
-  List<LatLng> polylineCoordinates = [];
-  // this is the key object - the PolylinePoints
-  // which generates every polyline between start and finish
-  PolylinePoints polylinePoints = PolylinePoints();
+  // List<LatLng> polylineCoordinates = [];
+  // // this is the key object - the PolylinePoints
+  // // which generates every polyline between start and finish
+  // PolylinePoints polylinePoints = PolylinePoints();
   String googleAPIKey = "AIzaSyDfgqTqhA1NkD8KzwgIS6Z0nNwL2JV-cuQ";
   // for my custom icons
   BitmapDescriptor sourceIcon;
@@ -41,20 +61,37 @@ class MapPageState extends State<MapPage> {
   var _mapController;
   BitmapDescriptor destinationIcon;
   BitmapDescriptor checkicon;
+  var typ = 1;
+  bool follow = false;
+  bool traffic = false;
   @override
   void initState() {
     super.initState();
     setSourceAndDestinationIcons();
-    setPolylines();
+    // setPolylines();
     const fiveSeconds = const Duration(seconds: 2);
     // _fetchData() is your function to fetch data
 
-    Timer.periodic(fiveSeconds, (Timer t) async {
+    Timer.periodic(fiveSeconds, (timer) {
       setMapPins();
-      print('called');
-      _mapController.moveCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
     });
-    Data = FirebaseFirestore.instance.collection('MiraRoad').snapshots();
+
+    // Timer.periodic(fiveSeconds, (Timer t) async {
+    //   setMapPins();
+    //   print('called');
+    //   _mapController.moveCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
+    //   PointLatLng a = PointLatLng(lat, lng);
+    //   PointLatLng b = PointLatLng(19.3505548, 72.9166332);
+    //   // _createPolylines(a, b);
+    // });
+    Data = FirebaseFirestore.instance.collection(location + busval).snapshots();
+
+    // Data = FirebaseFirestore.instance
+    //     .collection(location)
+    //     // .doc(busval)
+    //     // .collection(location)
+    //     // .doc(busval)
+    //     .snapshots();
   }
 
   void setSourceAndDestinationIcons() async {
@@ -67,6 +104,22 @@ class MapPageState extends State<MapPage> {
 
     destinationIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5), iconc);
+  }
+
+  followcamera() {
+    const fiveSeconds = const Duration(seconds: 2);
+    Timer.periodic(fiveSeconds, (Timer t) async {
+      setMapPins();
+      print('called');
+      if (follow) {
+        _mapController.moveCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
+        PointLatLng a = PointLatLng(lat, lng);
+        PointLatLng b = PointLatLng(19.3505548, 72.9166332);
+      } else {
+        t.cancel();
+      }
+      // _createPolylines(a, b);
+    });
   }
 
   // @override
@@ -89,42 +142,199 @@ class MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<ProviderData>(context);
     CameraPosition initialLocation = CameraPosition(
         zoom: CAMERA_ZOOM,
         bearing: CAMERA_BEARING,
         tilt: CAMERA_TILT,
         target: SOURCE_LOCATION);
     return SafeArea(
-        child: Container(
-      child: StreamBuilder(
-        stream: Data,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return ListView(
-            shrinkWrap: true,
-            children: snapshot.data.docs.map<Widget>((document) {
-              // return Text(document['UserName']);
-              // lat = document['latitude'];
-              // lng = document['longitude'];
-              // DRIVER_LOCATION = LatLng(lat, lng);
-              return GooglePage(
-                document['latitude'],
-                document['longitude'],
-              );
-            }).toList(),
-          );
-        },
+      child: Stack(
+        children: [
+          Container(
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection(location + busval)
+                  .doc('location')
+                  .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  var doc = snapshot.data;
+                  DRIVER_LOCATION = LatLng(doc['latitude'], doc['longitude']);
+                  lat = doc['latitude'];
+                  lng = doc['longitude'];
+                  CameraPosition initialLocation = CameraPosition(
+                    zoom: CAMERA_ZOOM,
+                    bearing: CAMERA_BEARING,
+                    tilt: CAMERA_TILT,
+                    target: LatLng(doc['latitude'], doc['longitude']),
+                  );
+                  return Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: GoogleMap(
+                        myLocationEnabled: true,
+                        rotateGesturesEnabled: true,
+                        trafficEnabled: traffic,
+                        buildingsEnabled: true,
+                        compassEnabled: true,
+                        tiltGesturesEnabled: true,
+                        markers: _markers,
+                        // polylines: _polylines,
+                        polylines: Set<Polyline>.of(polylines.values),
+                        // mapType: MapType.normal,
+                        mapType: maptyp(typ),
+
+                        // onCameraMove: (),
+                        initialCameraPosition: initialLocation,
+                        onMapCreated: onMapCreated),
+                  );
+                }
+                // return ListView(
+                //   shrinkWrap: true,
+                //   children: snapshot.data.docs.map<Widget>((document) {
+                //     // return Text(document['UserName']);
+                //     lat = document['latitude'];
+                //     lng = document['longitude'];
+                //     DRIVER_LOCATION = LatLng(lat, lng);
+
+                //     // return GooglePage(
+                //     //   document['latitude'],
+                //     //   document['longitude'],
+                //     // );
+                //   }).toList(),
+                // );
+              },
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Align(
+              alignment: Alignment.topRight,
+              // right: 10,
+              child: Column(
+                children: [
+                  FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        if (typ == 3) {
+                          typ = 1;
+                        } else {
+                          typ++;
+                        }
+                      });
+                    },
+                    backgroundColor: Color(0xff19196f),
+                    child: Icon(
+                      Icons.map_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        follow = !follow;
+                      });
+                      followcamera();
+                    },
+                    backgroundColor: Color(0xff19196f),
+                    child: Icon(
+                      follow ? Icons.no_transfer : Icons.directions_bus,
+                      color: follow ? Colors.white : Colors.white,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        traffic = !traffic;
+                      });
+                    },
+                    backgroundColor: Color(0xff19196f),
+                    child: Icon(
+                      traffic ? Icons.edit_road : Icons.traffic,
+                      color: traffic ? Colors.white : Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-    ));
+    );
+  }
+
+  MapType maptyp(int a) {
+    switch (a) {
+      case 1:
+        return MapType.normal;
+        break;
+      case 2:
+        return MapType.hybrid;
+        break;
+      case 3:
+        return MapType.terrain;
+        break;
+      default:
+        return MapType.normal;
+        break;
+    }
+  }
+
+  // _createPolylines(Position start, Position destination) async {
+  _createPolylines(PointLatLng start, PointLatLng dest) async {
+    // Initializing PolylinePoints
+    polylinePoints = PolylinePoints();
+
+    // Generating the list of coordinates to be used for
+    // drawing the polylines
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      // Secrets.API_KEY, // Google Maps API Key
+      'AIzaSyDfgqTqhA1NkD8KzwgIS6Z0nNwL2JV-cuQ',
+      // start, dest,
+      // PointLatLng(start.latitude, start.longitude),
+      // PointLatLng(destination.latitude, destination.longitude),
+      PointLatLng(19.2798547, 72.8740709),
+      PointLatLng(19.3505548, 72.9166332),
+      travelMode: TravelMode.transit,
+    );
+
+    // Adding the coordinates to the list
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+    } else {
+      print('yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
+    }
+
+    // Defining an ID
+    PolylineId id = PolylineId('poly');
+
+    // Initializing Polyline
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.red,
+      points: polylineCoordinates,
+      width: 3,
+    );
+
+    // Adding the polyline to the map
+    polylines[id] = polyline;
   }
 
   Widget GooglePage(var latp, var lonp) {
     DRIVER_LOCATION = LatLng(latp, lonp);
-
     lat = latp;
     lng = lonp;
 
@@ -143,7 +353,8 @@ class MapPageState extends State<MapPage> {
           compassEnabled: true,
           tiltGesturesEnabled: false,
           markers: _markers,
-          polylines: _polylines,
+          // polylines: _polylines,
+          polylines: Set<Polyline>.of(polylines.values),
           mapType: MapType.normal,
           // onCameraMove: (),
           initialCameraPosition: initialLocation,
@@ -155,7 +366,7 @@ class MapPageState extends State<MapPage> {
     // controller.setMapStyle(Utils.mapStyles);
     _controller.complete(controller);
     setMapPins();
-    setPolylines();
+    // setPolylines();
     setState(() {
       _mapController = controller;
       _mapController.moveCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
@@ -188,35 +399,35 @@ class MapPageState extends State<MapPage> {
     });
   }
 
-  setPolylines() async {
-    List<PointLatLng> result = await polylinePoints?.getRouteBetweenCoordinates(
-        googleAPIKey,
-        SOURCE_LOCATION.latitude,
-        SOURCE_LOCATION.longitude,
-        DEST_LOCATION.latitude,
-        DEST_LOCATION.longitude);
-    if (result.isNotEmpty) {
-      // loop through all PointLatLng points and convert them
-      // to a list of LatLng, required by the Polyline
-      result.forEach((PointLatLng point) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
-    }
+  // setPolylines() async {
+  //   List<PointLatLng> result = await polylinePoints?.getRouteBetweenCoordinates(
+  //       googleAPIKey,
+  //       SOURCE_LOCATION.latitude,
+  //       SOURCE_LOCATION.longitude,
+  //       DEST_LOCATION.latitude,
+  //       DEST_LOCATION.longitude);
+  //   if (result.isNotEmpty) {
+  //     // loop through all PointLatLng points and convert them
+  //     // to a list of LatLng, required by the Polyline
+  //     result.forEach((PointLatLng point) {
+  //       polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+  //     });
+  //   }
 
-    setState(() {
-      // create a Polyline instance
-      // with an id, an RGB color and the list of LatLng pairs
-      Polyline polyline = Polyline(
-          polylineId: PolylineId("poly"),
-          color: Color.fromARGB(255, 40, 122, 198),
-          points: polylineCoordinates);
+  //   setState(() {
+  //     // create a Polyline instance
+  //     // with an id, an RGB color and the list of LatLng pairs
+  //     Polyline polyline = Polyline(
+  //         polylineId: PolylineId("poly"),
+  //         color: Color.fromARGB(255, 40, 122, 198),
+  //         points: polylineCoordinates);
 
-      // add the constructed polyline as a set of points
-      // to the polyline set, which will eventually
-      // end up showing up on the map
-      _polylines.add(polyline);
-    });
-  }
+  //     // add the constructed polyline as a set of points
+  //     // to the polyline set, which will eventually
+  //     // end up showing up on the map
+  //     _polylines.add(polyline);
+  //   });
+  // }
 }
 
 // class Utils {

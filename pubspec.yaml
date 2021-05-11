@@ -86,17 +86,27 @@ dependencies:
   flutter_local_notifications: ^4.0.0
   open_file: ^3.1.0
   downloads_path_provider_28: ^0.1.0
-  google_maps_flutter: ^0.5.21+15
+  # google_maps_flutter: ^0.5.21+15
+  google_maps_flutter: ^0.5.28+1
   location: ^2.3.5
   google_map_polyline: ^0.2.0+1
-  flutter_polyline_points: ^0.1.0
+  # flutter_polyline_points: ^0.1.0
   geocoder: ^0.2.1
+  flutter_polyline_points: ^0.2.1
+  geolocator: ^6.2.1
+
+  
+  
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logobus.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

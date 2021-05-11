@@ -1,10 +1,12 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 class ProviderData extends ChangeNotifier {
   String _email;
   String _password;
+  String _location;
+  String _Photo;
+  String _phone;
   String _uid;
   Color _themeA;
   Color _themeB;
@@ -26,6 +28,11 @@ class ProviderData extends ChangeNotifier {
   String get email => _email;
   String get password => _password;
   String get uid => _uid;
+
+  String get location => _location;
+  String get Photo => _Photo;
+  String get phone => _phone;
+
   String get color => _color;
 
   Color get themeA => _themeA;
@@ -46,6 +53,24 @@ class ProviderData extends ChangeNotifier {
 
   void setpassword(String password) {
     _password = password;
+    notifyListeners();
+    savePreferences();
+  }
+
+  void setlocation(String location) {
+    _location = location;
+    notifyListeners();
+    savePreferences();
+  }
+
+  void setPhoto(String Photo) {
+    _Photo = Photo;
+    notifyListeners();
+    savePreferences();
+  }
+
+  void setphone(String phone) {
+    _phone = phone;
     notifyListeners();
     savePreferences();
   }
@@ -79,6 +104,10 @@ class ProviderData extends ChangeNotifier {
     prefs.setString('email', _email);
     prefs.setString('password', _password);
     prefs.setString('uid', _uid);
+    prefs.setString('Photo', _Photo);
+    prefs.setString('phone', _phone);
+    prefs.setString('location', _location);
+
     // prefs.setString('themeA', 'a');
     // prefs.setString('themeB', 'b');
     // prefs.setString('themeC', 'c');
@@ -91,6 +120,10 @@ class ProviderData extends ChangeNotifier {
     String password = prefs.getString('password');
     String uid = prefs.getString('uid');
     String color = prefs.getString('color');
+    String phone = prefs.getString('phone');
+    String Photo = prefs.getString('Photo');
+    String location = prefs.getString('location');
+
     // String themeB = prefs.getString('themeB');
     // String themeC = prefs.getString('themeC');
 
@@ -103,6 +136,17 @@ class ProviderData extends ChangeNotifier {
     if (uid != null) {
       setuid(uid);
     }
+
+    if (phone != null) {
+      setphone(phone);
+    }
+    if (Photo != null) {
+      setPhoto(Photo);
+    }
+    if (location != null) {
+      setlocation(location);
+    }
+
     if (color != null) {
       setcolor(color);
     }
