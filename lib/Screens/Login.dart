@@ -541,7 +541,7 @@ class _loginState extends State<login> {
                                             'SE',
                                             'TE',
                                             'BE',
-                                            'College Staff or Faculty Members'
+                                            'College Staff/Faculty Members'
                                           ].map<DropdownMenuItem<String>>(
                                               (String value) {
                                             return DropdownMenuItem<String>(
@@ -610,14 +610,18 @@ class _loginState extends State<login> {
                         ),
                       ),
                       Positioned(
-                        top: 410,
+                        top: 385,
                         child: Center(
                           child: GestureDetector(
                             onTap: () {
                               print(
                                   'ontapooooooooooooooooooooooooooooooooooooo');
                               if (_emailController.text != null &&
-                                  _passController.text != null) {
+                                  _passController.text != null &&
+                                  _namecontroller.text != null &&
+                                  _phoneCOntroller.text != null &&
+                                  _chosenvalueLocation != null &&
+                                  _chosenvalueClass != null) {
                                 FirebaseAuth.instance
                                     .createUserWithEmailAndPassword(
                                         email: _emailController.text,
@@ -659,17 +663,17 @@ class _loginState extends State<login> {
                                           .setlocation(_chosenvalueLocation);
                                       provider.setPhoto(imageurl);
                                       provider.setphone(_phoneCOntroller.text);
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Navigation()));
                                     }).catchError((e) {
                                       print("Error: $e" + "!");
                                       print(
                                           'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
                                       DialogBox(context, e.toString());
                                     });
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                Navigation()));
                                   } else {
                                     DialogBox(context, 'Error Authentication');
                                   }

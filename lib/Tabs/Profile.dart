@@ -1,5 +1,6 @@
 import 'package:Ucoe/Model/UserProfile.dart';
 import 'package:Ucoe/Provider/ProviderData.dart';
+import 'package:Ucoe/Screens/Edit_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -147,7 +148,13 @@ class _ProfileState extends State<Profile> {
                               child: Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  editprofile()));
+                                    },
                                     child: Container(
                                       decoration: BoxDecoration(
                                           // gradient: LinearGradient(
@@ -324,9 +331,11 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                             Container(
+                              width: 200,
                               margin: EdgeInsets.only(left: 15),
                               child: Text(
                                 email,
+                                maxLines: 2,
                                 style: TextStyle(
                                   // fontWeight: FontWeight.w600,
                                   color: Colors.black,
@@ -375,9 +384,11 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                             Container(
+                              width: 200,
                               margin: EdgeInsets.only(left: 15),
                               child: Text(
                                 phone,
+                                maxLines: 2,
                                 style: TextStyle(
                                   // fontWeight: FontWeight.w600,
                                   color: Colors.black,
@@ -426,9 +437,11 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                             Container(
+                              width: 200,
                               margin: EdgeInsets.only(left: 15),
                               child: Text(
                                 classroom,
+                                maxLines: 2,
                                 style: TextStyle(
                                   // fontWeight: FontWeight.w600,
                                   color: Colors.black,
@@ -477,11 +490,13 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                             Container(
+                              width: 200,
                               margin: EdgeInsets.only(
                                 left: 15,
                               ),
                               child: Text(
                                 location,
+                                maxLines: 2,
                                 style: TextStyle(
                                   // fontWeight: FontWeight.w600,
                                   color: Colors.black,
