@@ -1,5 +1,6 @@
 import 'package:Ucoe/Model/UserProfile.dart';
 import 'package:Ucoe/Provider/ProviderData.dart';
+import 'package:Ucoe/Screens/busFee.dart';
 import 'package:Ucoe/Tabs/Track.dart';
 import 'package:Ucoe/home/announcement.dart';
 import 'package:Ucoe/home/event.dart';
@@ -158,7 +159,7 @@ class _homeState extends State<home> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => event()));
+                                      builder: (context) => busfees()));
                             },
                             child: Container(
                               child: Column(

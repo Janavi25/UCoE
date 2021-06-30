@@ -9,6 +9,7 @@ import 'package:Ucoe/style/colour.dart';
 import 'package:Ucoe/style/decoration.dart';
 import 'package:Ucoe/style/text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -402,12 +403,13 @@ class _loginState extends State<login> {
                               Divider(color: Colors.grey, height: 8),
                               TextFormField(
                                 controller: _phoneCOntroller,
+                                keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                     prefixIcon: Icon(
                                       Icons.phone,
                                       color: Colors.grey,
                                     ),
-                                    labelText: "Phone Number",
+                                    labelText: " Enter Phone Number",
                                     labelStyle:
                                         TextStyle(color: Colors.black87),
                                     enabledBorder: UnderlineInputBorder(
@@ -485,6 +487,10 @@ class _loginState extends State<login> {
                               // ),
                               Divider(color: Colors.grey, height: 8),
                               TextFormField(
+                                validator: (email) =>
+                                    EmailValidator.validate(email)
+                                        ? null
+                                        : "Invalid Email Address",
                                 controller: _emailController,
                                 decoration: InputDecoration(
                                     prefixIcon: Icon(
@@ -570,6 +576,16 @@ class _loginState extends State<login> {
                                   )),
                               Divider(color: Colors.grey, height: 8),
                               TextFormField(
+                                validator: (value) {
+                                  Pattern pattern =
+                                      r'^(?=.[0-9]+.)(?=.[a-zA-Z]+.)[0-9a-zA-Z]{6,}$';
+
+                                  RegExp regex = new RegExp(pattern);
+                                  if (!regex.hasMatch(value)) {
+                                    return "Invalid Passsword";
+                                  } else
+                                    return null;
+                                },
                                 controller: _passController,
                                 obscureText: _passwordVisible,
                                 decoration: InputDecoration(
@@ -663,7 +679,7 @@ class _loginState extends State<login> {
                                           .setlocation(_chosenvalueLocation);
                                       provider.setPhoto(imageurl);
                                       provider.setphone(_phoneCOntroller.text);
-                                      Navigator.of(context).pop();
+                                      // Navigator.of(context).pop();
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>

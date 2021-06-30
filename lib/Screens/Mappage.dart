@@ -53,7 +53,7 @@ class MapPageState extends State<MapPage> {
   // // this is the key object - the PolylinePoints
   // // which generates every polyline between start and finish
   // PolylinePoints polylinePoints = PolylinePoints();
-  String googleAPIKey = "AIzaSyDfgqTqhA1NkD8KzwgIS6Z0nNwL2JV-cuQ";
+  String googleAPIKey = "<YOUR_API_KEY>";
   // for my custom icons
   BitmapDescriptor sourceIcon;
   BitmapDescriptor driverIcon;
@@ -300,7 +300,7 @@ class MapPageState extends State<MapPage> {
     // drawing the polylines
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       // Secrets.API_KEY, // Google Maps API Key
-      'AIzaSyDfgqTqhA1NkD8KzwgIS6Z0nNwL2JV-cuQ',
+      '<YOUR_API_KEY>',
       // start, dest,
       // PointLatLng(start.latitude, start.longitude),
       // PointLatLng(destination.latitude, destination.longitude),

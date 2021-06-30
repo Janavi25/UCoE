@@ -415,8 +415,12 @@ class _feesState extends State<fees> {
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               Container(
+                                width: 140,
                                 margin: EdgeInsets.only(left: 5),
-                                child: Text(classroom),
+                                child: Text(
+                                  classroom,
+                                  maxLines: 2,
+                                ),
                               ),
                             ],
                           ),

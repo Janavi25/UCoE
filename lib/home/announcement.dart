@@ -60,7 +60,7 @@ class _announcementState extends State<announcement> {
               decoration: BoxDecoration(
                   image: DecorationImage(
                       image: NetworkImage(
-                          'https://lh3.googleusercontent.com/proxy/MzgNgeHgmq3uTBRGU7Ais224dUl5oHy2-toQLp1TYATcKrc1kdzAmAeLyACvIG8-y0ysJan2mop4bPL2X7imNi8WU0-ZIBvkbOUBuGIDM35vNV4e2pqxQzEywAS03DE'))),
+                          'https://www.freeiconspng.com/thumbs/bell-icons/bell-icon-8.png'))),
             ),
             Container(
               // width: 220,
