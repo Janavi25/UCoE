@@ -16,7 +16,7 @@
         android:label="Ucoe"
         android:icon="@mipmap/ic_launcher">
               <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="<YOUR_API_KEY>"/>
+            android:value="AIzaSyDfgqTqhA1NkD8KzwgIS6Z0nNwL2JV-cuQ"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
